@@ -22,10 +22,12 @@ void print_field(int generation); /*フィールドの初期化*/
 void copy_border_cells(void); /*左右と上下のデータをコピー*/
 int count_changes(void); /*変わったセルの数*/
 int sweep(void); /*生き死にを変える*/
-void update(void); /*バッファをコピー*/
 
 int main(int argc, char const* argv[])
 {
+	srand( (unsigned int) time (NULL) ); //XXX: こういう初期化はクラスで面倒を見るべき
+
+	//XXX: 引数から読むようにする
 	int p; /*初期配置における生きたセルのパーセンテージ*/
 	cout << "生きたセルは何パーセント? (整数で):" << endl;
 	cin >> p;
@@ -35,11 +37,8 @@ int main(int argc, char const* argv[])
 	print_field(generation);
 
 	while(sweep()){
-		++generation;	
-
-		update();
-		print_field(generation);
-		usleep(200*1000);
+		print_field(++generation);
+		usleep(200*1000); //XXX: sleepせずに一気に計算してあとからゆっくり見るという方法のほうが良い
 
 /* ここら辺、来ないような気がするのでコメントアウト（by 上田）
 		change = count_changes();
@@ -59,12 +58,6 @@ int main(int argc, char const* argv[])
 
 int get_random(int min,int max) /*minからmaxまでの乱数を返す関数*/
 {
-	static bool flag;
-	if(flag){
-		srand( (unsigned int) time (NULL) );
-		flag = false;
-	}
-	
 	return min + (int)( rand()*(max - min + 1.0)/(1.0 + RAND_MAX) );
 }
 
@@ -147,17 +140,15 @@ int sweep(void)
 			}				
 		}			
 	}
+	int change = count_changes();
 
-	return count_changes();
-}
-
-void update(void)
-{
-	/*fieldをnext_fieldで更新*/
 	for(int i=1;i<31;++i)
 		for(int ii=1;ii<31;++ii)
 			field[i][ii] = next_field[i][ii];
 
 	copy_border_cells();
+
+	return change;
 }
+
 
