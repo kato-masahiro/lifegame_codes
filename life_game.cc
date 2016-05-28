@@ -18,11 +18,44 @@ int next_field[32][32];
 int get_random(int min,int max); /*minからmaxまでの乱数を返す関数*/
 int get_sum(int x,int y); /*周囲8セルの合計を返す関数*/
 void init_field(int init_living_pct); /*フィールドの初期化*/
-void print_field(void); /*フィールドの初期化*/
+void print_field(int generation); /*フィールドの初期化*/
 void copy_border_cells(void); /*左右と上下のデータをコピー*/
 int count_changes(void); /*変わったセルの数*/
 int sweep(void); /*生き死にを変える*/
 void update(void); /*バッファをコピー*/
+
+int main(int argc, char const* argv[])
+{
+	int p; /*初期配置における生きたセルのパーセンテージ*/
+	cout << "生きたセルは何パーセント? (整数で):" << endl;
+	cin >> p;
+	init_field(p);
+
+	int generation = 0;
+	print_field(generation);
+
+	while(sweep()){
+		++generation;	
+
+		update();
+		print_field(generation);
+		usleep(200*1000);
+
+/* ここら辺、来ないような気がするのでコメントアウト（by 上田）
+		change = count_changes();
+
+		if (change == 0){
+			++cnt;
+			cout << "loop" << endl;
+		}
+		if (cnt >= 10)
+			break;
+
+		change = 0;
+*/
+	}
+	exit(0);
+}
 
 int get_random(int min,int max) /*minからmaxまでの乱数を返す関数*/
 {
@@ -128,35 +161,3 @@ void update(void)
 	copy_border_cells();
 }
 
-int main(int argc, char const* argv[])
-{
-	int p; /*初期配置における生きたセルのパーセンテージ*/
-	cout << "生きたセルは何パーセント? (整数で):" << endl;
-	cin >> p;
-	init_field(p);
-
-	int generation = 0;
-	print_field(generation);
-
-	while(sweep()){
-		++generation;	
-
-		update();
-		print_field(generation);
-		usleep(200*1000);
-
-/* ここら辺、来ないような気がするのでコメントアウト（by 上田）
-		change = count_changes();
-
-		if (change == 0){
-			++cnt;
-			cout << "loop" << endl;
-		}
-		if (cnt >= 10)
-			break;
-
-		change = 0;
-*/
-	}
-	exit(0);
-}
