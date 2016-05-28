@@ -52,6 +52,7 @@ void init_field(int init_living_pct)
 				field[i][ii] = 0;
 		}
 	}
+	copy_border_cells();
 }
 
 void print_field(int generation)
@@ -123,30 +124,26 @@ void update(void)
 	for(int i=1;i<31;++i)
 		for(int ii=1;ii<31;++ii)
 			field[i][ii] = next_field[i][ii];
+
+	copy_border_cells();
 }
 
 int main(int argc, char const* argv[])
 {
-	int generation = 0;
-	/*初期配置の決定*/
-	int init_living_percentage; /*初期配置における生きたセルのパーセンテージ*/
+	int p; /*初期配置における生きたセルのパーセンテージ*/
 	cout << "生きたセルは何パーセント? (整数で):" << endl;
-	cin >> init_living_percentage;
-	init_field(init_living_percentage);
+	cin >> p;
+	init_field(p);
 
-	/*以下を繰り返す*/
-	//int change = 0;
-	while(1){
-		/*現在のfieldを画面に出力*/
-		usleep(200*1000);
-		print_field(generation);
+	int generation = 0;
+	print_field(generation);
 
-		copy_border_cells();
-		if (sweep() == 0)
-			break;
-
+	while(sweep()){
 		++generation;	
+
 		update();
+		print_field(generation);
+		usleep(200*1000);
 
 /* ここら辺、来ないような気がするのでコメントアウト（by 上田）
 		change = count_changes();
